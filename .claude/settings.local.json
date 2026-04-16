@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npx nest:*)",
+      "Bash(PGPASSWORD=postgres /c/Program Files/PostgreSQL/17/bin/psql:*)",
+      "Bash(PGPASSWORD=postgres /c/Program Files/PostgreSQL/17/bin/pg_isready:*)",
+      "Bash(curl -s http://localhost:5173)"
+    ]
+  }
+}
