@@ -31,10 +31,18 @@ import { Parent } from './parents/entities/parent.entity';
           return {
             type: 'postgres',
             url: databaseUrl,
-            ssl: { rejectUnauthorized: false },
+            // ssl: { rejectUnauthorized: false },
             entities: [User, Parent, Teacher, Activity, Student, AttendanceRecord, Payment, Agreement],
             synchronize: true,
             logging: false,
+               ssl: {                          // ← ADD THIS BLOCK
+      rejectUnauthorized: false     // Required for Neon
+    },
+    extra: {                        // ← OPTIONAL BUT RECOMMENDED
+      ssl: {
+        rejectUnauthorized: false
+      }
+    }
           };
         }
         return {
