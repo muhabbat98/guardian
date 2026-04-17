@@ -21,9 +21,7 @@ export class StudentsService {
       firstName: student.firstName,
       lastName: student.lastName,
       dateOfBirth: student.dateOfBirth,
-      guardianName: student.guardianName,
-      guardianPhone: student.guardianPhone,
-      guardianEmail: student.guardianEmail,
+      parentId: student.parentId ?? undefined,
       address: student.address ?? undefined,
       enrollmentDate: student.enrollmentDate,
       activities: (student.activities ?? []).map((a) => a.id),
@@ -51,9 +49,7 @@ export class StudentsService {
       firstName: dto.firstName,
       lastName: dto.lastName,
       dateOfBirth: dto.dateOfBirth,
-      guardianName: dto.guardianName,
-      guardianPhone: dto.guardianPhone,
-      guardianEmail: dto.guardianEmail,
+      parentId: dto.parentId,
       address: dto.address,
       enrollmentDate: dto.enrollmentDate,
     });
@@ -85,8 +81,7 @@ export class StudentsService {
 
     // Update scalar fields
     const fields = [
-      'firstName', 'lastName', 'dateOfBirth', 'guardianName',
-      'guardianPhone', 'guardianEmail', 'address', 'enrollmentDate',
+      'firstName', 'lastName', 'dateOfBirth', 'parentId', 'address', 'enrollmentDate',
     ] as const;
     for (const field of fields) {
       if (dto[field] !== undefined) (student as any)[field] = dto[field];

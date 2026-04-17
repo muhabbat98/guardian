@@ -3,7 +3,9 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToMany,
+  ManyToOne,
   OneToMany,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -11,6 +13,7 @@ import { Activity } from '../../activities/entities/activity.entity';
 import { AttendanceRecord } from '../../attendance/entities/attendance.entity';
 import { Payment } from '../../payments/entities/payment.entity';
 import { Agreement } from '../../agreements/entities/agreement.entity';
+import { Parent } from '../../parents/entities/parent.entity';
 
 @Entity('students')
 export class Student {
@@ -26,20 +29,21 @@ export class Student {
   @Column({ name: 'date_of_birth' })
   dateOfBirth: string;
 
-  @Column({ name: 'guardian_name' })
-  guardianName: string;
+  @Column({ name: 'parent_id', nullable: true })
+  parentId: string;
 
-  @Column({ name: 'guardian_phone' })
-  guardianPhone: string;
-
-  @Column({ name: 'guardian_email' })
-  guardianEmail: string;
+  @ManyToOne(() => Parent, (parent) => parent.children, { nullable: true })
+  @JoinColumn({ name: 'parent_id' })
+  parent: Parent;
 
   @Column({ nullable: true, type: 'text' })
   address: string;
 
   @Column({ name: 'enrollment_date' })
   enrollmentDate: string;
+
+  @Column({ name: 'user_id', nullable: true, unique: true })
+  userId: string;
 
   @ManyToMany(() => Activity, (activity) => activity.students)
   activities: Activity[];

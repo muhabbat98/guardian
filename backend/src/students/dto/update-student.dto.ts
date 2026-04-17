@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsOptional, IsArray } from 'class-validator';
+import { IsString, IsOptional, IsArray } from 'class-validator';
 
 export class UpdateStudentDto {
   @IsOptional()
@@ -15,15 +15,7 @@ export class UpdateStudentDto {
 
   @IsOptional()
   @IsString()
-  guardianName?: string;
-
-  @IsOptional()
-  @IsString()
-  guardianPhone?: string;
-
-  @IsOptional()
-  @IsEmail()
-  guardianEmail?: string;
+  parentId?: string;
 
   @IsOptional()
   @IsString()

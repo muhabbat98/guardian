@@ -28,6 +28,9 @@ export class Teacher {
   @Column()
   specialization: string;
 
+  @Column({ name: 'user_id', nullable: true, unique: true })
+  userId: string;
+
   @ManyToMany(() => Activity, (activity) => activity.teachers)
   activities: Activity[];
 

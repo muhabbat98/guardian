@@ -9,12 +9,16 @@ import { PaymentsModule } from './payments/payments.module';
 import { AgreementsModule } from './agreements/agreements.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { SeedModule } from './seed/seed.module';
+import { AuthModule } from './auth/auth.module';
+import { ParentsModule } from './parents/parents.module';
 import { Teacher } from './teachers/entities/teacher.entity';
 import { Activity } from './activities/entities/activity.entity';
 import { Student } from './students/entities/student.entity';
 import { AttendanceRecord } from './attendance/entities/attendance.entity';
 import { Payment } from './payments/entities/payment.entity';
 import { Agreement } from './agreements/entities/agreement.entity';
+import { User } from './auth/entities/user.entity';
+import { Parent } from './parents/entities/parent.entity';
 
 @Module({
   imports: [
@@ -28,7 +32,7 @@ import { Agreement } from './agreements/entities/agreement.entity';
             type: 'postgres',
             url: databaseUrl,
             ssl: { rejectUnauthorized: false },
-            entities: [Teacher, Activity, Student, AttendanceRecord, Payment, Agreement],
+            entities: [User, Parent, Teacher, Activity, Student, AttendanceRecord, Payment, Agreement],
             synchronize: true,
             logging: false,
           };
@@ -40,13 +44,15 @@ import { Agreement } from './agreements/entities/agreement.entity';
           username: configService.get('DB_USERNAME', 'postgres'),
           password: configService.get('DB_PASSWORD', '123'),
           database: configService.get('DB_DATABASE', 'guardian_db'),
-          entities: [Teacher, Activity, Student, AttendanceRecord, Payment, Agreement],
+          entities: [User, Parent, Teacher, Activity, Student, AttendanceRecord, Payment, Agreement],
           synchronize: true,
           logging: false,
         };
       },
       inject: [ConfigService],
     }),
+    AuthModule,
+    ParentsModule,
     TeachersModule,
     ActivitiesModule,
     StudentsModule,

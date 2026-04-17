@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEmail, IsOptional, IsArray } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsArray } from 'class-validator';
 
 export class CreateStudentDto {
   @IsString()
@@ -13,17 +13,10 @@ export class CreateStudentDto {
   @IsNotEmpty()
   dateOfBirth: string;
 
+  /** UUID of the parent record */
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  guardianName: string;
-
-  @IsString()
-  @IsNotEmpty()
-  guardianPhone: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  guardianEmail: string;
+  parentId?: string;
 
   @IsOptional()
   @IsString()
