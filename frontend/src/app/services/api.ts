@@ -19,11 +19,9 @@ async function request<T>(
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
-  // Handle 401 - redirect to login
+  // Handle 401 - clear token but don't auto-redirect to prevent loops
   if (res.status === 401) {
     localStorage.removeItem('GUARDIAN_TOKEN');
-    window.location.href = '/auth/signin';
-    throw new Error('Unauthorized - please sign in again');
   }
 
   if (!res.ok) {

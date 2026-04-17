@@ -28,29 +28,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const loadUser = async () => {
       const token = localStorage.getItem('GUARDIAN_TOKEN');
-      if (token) {
-        try {
-          const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/auth/me`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (res.ok) {
-            const userData = await res.json();
-            setUser(userData);
-          } else {
-            localStorage.removeItem('GUARDIAN_TOKEN');
-          }
-        } catch (err) {
-          console.error('Failed to load user:', err);
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const userData = await res.json();
+          setUser(userData);
+        } else {
           localStorage.removeItem('GUARDIAN_TOKEN');
         }
+      } catch (err) {
+        console.error('Failed to load user:', err);
+        localStorage.removeItem('GUARDIAN_TOKEN');
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
     loadUser();
   }, []);
 
   const login = async (email: string, password: string) => {
-    const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/auth/signin`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/auth/signin`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -67,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signup = async (email: string, password: string, role: string, firstName: string, lastName: string) => {
-    const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/auth/signup`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, role, firstName, lastName }),
