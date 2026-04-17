@@ -137,10 +137,10 @@ export const translations = {
     agreement: 'Agreement',
     
     // Common
-    student: 'Student',
-    students: 'students',
-    teacher: 'Teacher',
-    teachers: 'teachers',
+    studentLabel: 'Student',
+    studentPluralLabel: 'students',
+    teacherLabel: 'Teacher',
+    teacherPluralLabel: 'teachers',
     required: 'Required',
     optional: 'Optional notes...',
     maximumStudents: 'Maximum number of students',
@@ -291,10 +291,10 @@ export const translations = {
     agreement: 'Соглашение',
     
     // Common
-    student: 'Ученик',
-    students: 'учеников',
-    teacher: 'Учитель',
-    teachers: 'учителей',
+    studentLabel: 'Ученик',
+    studentPluralLabel: 'учеников',
+    teacherLabel: 'Учитель',
+    teacherPluralLabel: 'учителей',
     required: 'Обязательно',
     optional: 'Необязательные заметки...',
     maximumStudents: 'Максимальное количество учеников',
@@ -445,10 +445,10 @@ export const translations = {
     agreement: 'Shartnoma',
     
     // Common
-    student: 'O\'quvchi',
-    students: 'o\'quvchilar',
-    teacher: 'O\'qituvchi',
-    teachers: 'o\'qituvchilar',
+    studentLabel: 'O\'quvchi',
+    studentPluralLabel: 'o\'quvchilar',
+    teacherLabel: 'O\'qituvchi',
+    teacherPluralLabel: 'o\'qituvchilar',
     required: 'Majburiy',
     optional: 'Ixtiyoriy izohlar...',
     maximumStudents: 'Maksimal o\'quvchilar soni',
