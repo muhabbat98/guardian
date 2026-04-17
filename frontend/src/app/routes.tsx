@@ -6,18 +6,64 @@ import { ActivityDetails } from "./components/ActivityDetails";
 import { Students } from "./components/Students";
 import { StudentDetails } from "./components/StudentDetails";
 import { NotFound } from "./components/NotFound";
+import { SignIn } from "./pages/SignIn";
+import { SignUp } from "./pages/SignUp";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 export const router = createBrowserRouter([
+  {
+    path: "/auth",
+    children: [
+      { path: "signin", Component: SignIn },
+      { path: "signup", Component: SignUp },
+    ],
+  },
   {
     path: "/",
     Component: Layout,
     children: [
-      { index: true, Component: Dashboard },
-      { path: "activities", Component: Activities },
-      { path: "activities/:id", Component: ActivityDetails },
-      { path: "students", Component: Students },
-      { path: "students/:id", Component: StudentDetails },
+      {
+        index: true,
+        Component: () => (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "activities",
+        Component: () => (
+          <ProtectedRoute>
+            <Activities />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "activities/:id",
+        Component: () => (
+          <ProtectedRoute>
+            <ActivityDetails />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "students",
+        Component: () => (
+          <ProtectedRoute>
+            <Students />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "students/:id",
+        Component: () => (
+          <ProtectedRoute>
+            <StudentDetails />
+          </ProtectedRoute>
+        ),
+      },
       { path: "*", Component: NotFound },
     ],
   },
 ]);
+

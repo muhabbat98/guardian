@@ -1,16 +1,20 @@
-import { Outlet, Link, useLocation } from 'react-router';
-import { Home, Calendar, Users, Menu, X, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router';
+import { Home, Calendar, Users, Menu, X, AlertCircle, Loader2, RefreshCw, LogOut, User } from 'lucide-react';
 import { useState } from 'react';
 import logo from 'figma:asset/a0872c80c0190fe6764ce4ea81f9ee41dabf202e.png';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useData } from '../contexts/DataContext';
 
 export function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { t } = useLanguage();
   const { loading, error, refreshAll } = useData();
+  const { user, logout } = useAuth();
 
   const navigation = [
     { name: t.dashboard, path: '/', icon: Home },
@@ -64,6 +68,38 @@ export function Layout() {
             <div className="flex items-center gap-2">
               {/* Language Switcher */}
               <LanguageSwitcher />
+
+              {/* User Menu */}
+              {user && (
+                <div className="relative">
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                  >
+                    <User className="w-5 h-5" />
+                    <div className="hidden sm:block text-left text-sm">
+                      <p className="font-medium text-gray-900">{user.firstName} {user.lastName}</p>
+                      <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+                    </div>
+                  </button>
+
+                  {userMenuOpen && (
+                    <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                      <button
+                        onClick={() => {
+                          logout();
+                          setUserMenuOpen(false);
+                          navigate('/auth/signin');
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span className="text-sm font-medium">Logout</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Mobile menu button */}
               <button

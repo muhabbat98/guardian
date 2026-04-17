@@ -5,11 +5,27 @@ async function request<T>(
   path: string,
   body?: unknown,
 ): Promise<T> {
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+
+  // Add JWT token if available
+  const token = localStorage.getItem('GUARDIAN_TOKEN');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${BASE_URL}/api${path}`, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
+
+  // Handle 401 - redirect to login
+  if (res.status === 401) {
+    localStorage.removeItem('GUARDIAN_TOKEN');
+    window.location.href = '/auth/signin';
+    throw new Error('Unauthorized - please sign in again');
+  }
+
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: res.statusText }));
     throw new Error(error.message || `Request failed: ${res.status}`);

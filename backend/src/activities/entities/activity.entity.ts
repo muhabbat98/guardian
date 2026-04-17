@@ -29,6 +29,9 @@ export class Activity {
   @Column({ nullable: true, type: 'text' })
   description: string;
 
+  @Column({ nullable: true, type: 'text' })
+  createdByUserId: string;
+
   @Column({ nullable: true, type: 'int' })
   capacity: number;
 

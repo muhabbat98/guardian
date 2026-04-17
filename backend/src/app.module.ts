@@ -11,6 +11,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { SeedModule } from './seed/seed.module';
 import { AuthModule } from './auth/auth.module';
 import { ParentsModule } from './parents/parents.module';
+import { AppointmentsModule } from './appointments/appointments.module';
 import { Teacher } from './teachers/entities/teacher.entity';
 import { Activity } from './activities/entities/activity.entity';
 import { Student } from './students/entities/student.entity';
@@ -19,6 +20,7 @@ import { Payment } from './payments/entities/payment.entity';
 import { Agreement } from './agreements/entities/agreement.entity';
 import { User } from './auth/entities/user.entity';
 import { Parent } from './parents/entities/parent.entity';
+import { Appointment } from './appointments/entities/appointment.entity';
 
 @Module({
   imports: [
@@ -32,7 +34,7 @@ import { Parent } from './parents/entities/parent.entity';
             type: 'postgres',
             url: databaseUrl,
             ssl: { rejectUnauthorized: false },
-            entities: [User, Parent, Teacher, Activity, Student, AttendanceRecord, Payment, Agreement],
+            entities: [User, Parent, Teacher, Activity, Student, AttendanceRecord, Payment, Agreement, Appointment],
             synchronize: true,
             logging: false,
           };
@@ -44,7 +46,7 @@ import { Parent } from './parents/entities/parent.entity';
           username: configService.get('DB_USERNAME', 'postgres'),
           password: configService.get('DB_PASSWORD', '123'),
           database: configService.get('DB_DATABASE', 'guardian_db'),
-          entities: [User, Parent, Teacher, Activity, Student, AttendanceRecord, Payment, Agreement],
+          entities: [User, Parent, Teacher, Activity, Student, AttendanceRecord, Payment, Agreement, Appointment],
           synchronize: true,
           logging: false,
         };
@@ -53,6 +55,7 @@ import { Parent } from './parents/entities/parent.entity';
     }),
     AuthModule,
     ParentsModule,
+    AppointmentsModule,
     TeachersModule,
     ActivitiesModule,
     StudentsModule,

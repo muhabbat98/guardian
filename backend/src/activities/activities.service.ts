@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Activity } from './entities/activity.entity';
@@ -6,6 +6,7 @@ import { Teacher } from '../teachers/entities/teacher.entity';
 import { Student } from '../students/entities/student.entity';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
+import { UserRole } from '../auth/entities/user.entity';
 
 @Injectable()
 export class ActivitiesService {
@@ -47,7 +48,7 @@ export class ActivitiesService {
     return this.toResponse(activity);
   }
 
-  async create(dto: CreateActivityDto) {
+  async create(dto: CreateActivityDto, user?: any) {
     const teachers =
       dto.teachers?.length
         ? await this.teachersRepo.findBy({ id: In(dto.teachers) })
@@ -63,6 +64,7 @@ export class ActivitiesService {
       dayOfWeek: dto.dayOfWeek,
       description: dto.description,
       capacity: dto.capacity,
+      createdByUserId: user?.id,
       teachers,
       students,
     });
@@ -71,12 +73,17 @@ export class ActivitiesService {
     return this.findOne(saved.id);
   }
 
-  async update(id: string, dto: UpdateActivityDto) {
+  async update(id: string, dto: UpdateActivityDto, user?: any) {
     const activity = await this.activitiesRepo.findOne({
       where: { id },
       relations: ['teachers', 'students'],
     });
     if (!activity) throw new NotFoundException(`Activity #${id} not found`);
+
+    // Teachers can only edit their own activities
+    if (user && user.role === UserRole.TEACHER && activity.createdByUserId !== user.id) {
+      throw new ForbiddenException('You can only edit activities you created');
+    }
 
     if (dto.teachers !== undefined) {
       activity.teachers = dto.teachers.length
@@ -99,9 +106,15 @@ export class ActivitiesService {
     return this.findOne(id);
   }
 
-  async remove(id: string) {
+  async remove(id: string, user?: any) {
     const activity = await this.activitiesRepo.findOneBy({ id });
     if (!activity) throw new NotFoundException(`Activity #${id} not found`);
+
+    // Teachers can only delete their own activities
+    if (user && user.role === UserRole.TEACHER && activity.createdByUserId !== user.id) {
+      throw new ForbiddenException('You can only delete activities you created');
+    }
+
     await this.activitiesRepo.remove(activity);
   }
 }

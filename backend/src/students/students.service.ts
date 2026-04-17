@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Student } from './entities/student.entity';
 import { Activity } from '../activities/entities/activity.entity';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { UserRole } from '../auth/entities/user.entity';
 
 @Injectable()
 export class StudentsService {
@@ -35,12 +36,20 @@ export class StudentsService {
     return students.map(this.toResponse.bind(this));
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, user?: any) {
     const student = await this.studentsRepo.findOne({
       where: { id },
       relations: ['activities'],
     });
     if (!student) throw new NotFoundException(`Student #${id} not found`);
+
+    // Students can only see themselves (unless admin)
+    if (user && user.role !== UserRole.ADMIN && user.role === UserRole.STUDENT) {
+      if (student.userId !== user.id) {
+        throw new ForbiddenException('You can only view your own profile');
+      }
+    }
+
     return this.toResponse(student);
   }
 
@@ -72,12 +81,17 @@ export class StudentsService {
     return this.findOne(saved.id);
   }
 
-  async update(id: string, dto: UpdateStudentDto) {
+  async update(id: string, dto: UpdateStudentDto, user?: any) {
     const student = await this.studentsRepo.findOne({
       where: { id },
       relations: ['activities'],
     });
     if (!student) throw new NotFoundException(`Student #${id} not found`);
+
+    // Students can only update their own profile
+    if (user && user.role === UserRole.STUDENT && student.userId !== user.id) {
+      throw new ForbiddenException('You can only update your own profile');
+    }
 
     // Update scalar fields
     const fields = [
