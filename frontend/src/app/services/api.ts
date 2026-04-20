@@ -99,6 +99,21 @@ export const agreementsApi = {
   remove: (id: string) => del(`/agreements/${id}`),
 };
 
+// ── Appointments ──────────────────────────────────────────
+export const appointmentsApi = {
+  getAll: (parentId?: string, teacherId?: string) => {
+    const params = new URLSearchParams();
+    if (parentId) params.append('parentId', parentId);
+    if (teacherId) params.append('teacherId', teacherId);
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    return get<any[]>(`/appointments${qs}`);
+  },
+  getOne: (id: string) => get<any>(`/appointments/${id}`),
+  create: (data: any) => post<any>('/appointments', data),
+  update: (id: string, data: any) => put<any>(`/appointments/${id}`, data),
+  remove: (id: string) => del(`/appointments/${id}`),
+};
+
 // ── Dashboard ─────────────────────────────────────────────────
 export const dashboardApi = {
   getStats: () => get<any>('/dashboard/stats'),

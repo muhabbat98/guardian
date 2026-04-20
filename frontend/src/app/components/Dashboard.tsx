@@ -7,7 +7,7 @@ export function Dashboard() {
   const { activities, students, payments, attendance } = useData();
   const { t } = useLanguage();
 
-  const todayAttendance = attendance.filter(a => a.date === '2026-03-11');
+  const todayAttendance = attendance.filter(a => a.date === new Date().toISOString().split('T')[0]);
   const presentCount = todayAttendance.filter(a => a.status === 'present').length;
   const pendingPayments = payments.filter(p => p.status === 'pending' || p.status === 'overdue');
   const overduePayments = payments.filter(p => p.status === 'overdue');

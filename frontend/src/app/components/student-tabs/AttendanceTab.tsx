@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useData } from '../../contexts/DataContext';
-import { Plus, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Plus, CheckCircle, XCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 interface AttendanceTabProps {
   studentId: string;
@@ -8,6 +8,7 @@ interface AttendanceTabProps {
 
 export function AttendanceTab({ studentId }: AttendanceTabProps) {
   const { attendance, activities, addAttendance, updateAttendance } = useData();
+  const { operationLoading } = useData();
   const [isAddingRecord, setIsAddingRecord] = useState(false);
   const [newRecord, setNewRecord] = useState({
     activityId: '',
@@ -158,14 +159,17 @@ export function AttendanceTab({ studentId }: AttendanceTabProps) {
               <button
                 type="button"
                 onClick={() => setIsAddingRecord(false)}
-                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                disabled={operationLoading}
+                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                disabled={operationLoading}
+                className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
+                {operationLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                 Add Record
               </button>
             </div>

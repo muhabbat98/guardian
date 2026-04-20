@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useData } from '../../contexts/DataContext';
-import { Plus, DollarSign, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Plus, DollarSign, CheckCircle, Clock, AlertCircle, Loader2 } from 'lucide-react';
 
 interface PaymentsTabProps {
   studentId: string;
@@ -8,6 +8,7 @@ interface PaymentsTabProps {
 
 export function PaymentsTab({ studentId }: PaymentsTabProps) {
   const { payments, addPayment, updatePayment } = useData();
+  const { operationLoading } = useData();
   const [isAddingPayment, setIsAddingPayment] = useState(false);
   const [newPayment, setNewPayment] = useState({
     amount: '',
@@ -194,14 +195,17 @@ export function PaymentsTab({ studentId }: PaymentsTabProps) {
               <button
                 type="button"
                 onClick={() => setIsAddingPayment(false)}
-                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                disabled={operationLoading}
+                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                disabled={operationLoading}
+                className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
+                {operationLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                 Add Payment
               </button>
             </div>
@@ -257,8 +261,10 @@ export function PaymentsTab({ studentId }: PaymentsTabProps) {
                   {payment.status !== 'paid' && (
                     <button
                       onClick={() => markAsPaid(payment.id)}
-                      className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors text-sm"
+                      disabled={operationLoading}
+                      className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
+                      {operationLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                       Mark as Paid
                     </button>
                   )}

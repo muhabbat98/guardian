@@ -13,6 +13,7 @@ import {
   attendanceApi,
   paymentsApi,
   agreementsApi,
+  appointmentsApi,
 } from '../services/api';
 
 export interface Activity {
@@ -79,6 +80,17 @@ export interface Teacher {
   specialization: string;
 }
 
+export interface Appointment {
+  id: string;
+  parentId: string;
+  teacherId: string;
+  title: string;
+  description?: string;
+  scheduledAt: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+  notes?: string;
+}
+
 interface DataContextType {
   activities: Activity[];
   students: Student[];
@@ -86,7 +98,9 @@ interface DataContextType {
   attendance: AttendanceRecord[];
   payments: Payment[];
   teachers: Teacher[];
+  appointments: Appointment[];
   loading: boolean;
+  operationLoading: boolean;
   error: string | null;
   refreshAll: () => Promise<void>;
   addActivity: (activity: Omit<Activity, 'id'>) => Promise<void>;
@@ -104,6 +118,9 @@ interface DataContextType {
   addTeacher: (teacher: Omit<Teacher, 'id'>) => Promise<void>;
   updateTeacher: (id: string, teacher: Partial<Teacher>) => Promise<void>;
   deleteTeacher: (id: string) => Promise<void>;
+  addAppointment: (appointment: Omit<Appointment, 'id'>) => Promise<void>;
+  updateAppointment: (id: string, appointment: Partial<Appointment>) => Promise<void>;
+  deleteAppointment: (id: string) => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -121,8 +138,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [operationLoading, setOperationLoading] = useState(false);
 
   const fetchAll = useCallback(async () => {
     try {
@@ -135,6 +154,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         attendanceData,
         paymentsData,
         agreementsData,
+        appointmentsData,
       ] = await Promise.all([
         activitiesApi.getAll(),
         studentsApi.getAll(),
@@ -142,6 +162,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         attendanceApi.getAll(),
         paymentsApi.getAll(),
         agreementsApi.getAll(),
+        appointmentsApi.getAll(),
       ]);
       setActivities(activitiesData);
       setStudents(studentsData);
@@ -149,6 +170,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       setAttendance(attendanceData);
       setPayments(paymentsData);
       setAgreements(agreementsData);
+      setAppointments(appointmentsData);
     } catch (err: any) {
       setError(err.message || 'Failed to connect to server');
     } finally {
@@ -162,108 +184,214 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   // ── Activities ────────────────────────────────────────────
   const addActivity = async (data: Omit<Activity, 'id'>) => {
-    await activitiesApi.create(data);
-    const updated = await activitiesApi.getAll();
-    setActivities(updated);
+    try {
+      setOperationLoading(true);
+      await activitiesApi.create(data);
+      const updated = await activitiesApi.getAll();
+      setActivities(updated);
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   const updateActivity = async (id: string, data: Partial<Activity>) => {
-    await activitiesApi.update(id, data);
-    const updated = await activitiesApi.getAll();
-    setActivities(updated);
+    try {
+      setOperationLoading(true);
+      await activitiesApi.update(id, data);
+      const updated = await activitiesApi.getAll();
+      setActivities(updated);
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   const deleteActivity = async (id: string) => {
-    await activitiesApi.remove(id);
-    setActivities((prev) => prev.filter((a) => a.id !== id));
-    // Also remove from students' activity lists
-    setStudents((prev) =>
-      prev.map((s) => ({ ...s, activities: s.activities.filter((aid) => aid !== id) })),
-    );
+    try {
+      setOperationLoading(true);
+      await activitiesApi.remove(id);
+      setActivities((prev) => prev.filter((a) => a.id !== id));
+      // Also remove from students' activity lists
+      setStudents((prev) =>
+        prev.map((s) => ({ ...s, activities: s.activities.filter((aid) => aid !== id) })),
+      );
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   // ── Students ──────────────────────────────────────────────
   const addStudent = async (data: Omit<Student, 'id'>) => {
-    await studentsApi.create(data);
-    const [updatedStudents, updatedActivities] = await Promise.all([
-      studentsApi.getAll(),
-      activitiesApi.getAll(),
-    ]);
-    setStudents(updatedStudents);
-    setActivities(updatedActivities);
+    try {
+      setOperationLoading(true);
+      await studentsApi.create(data);
+      const [updatedStudents, updatedActivities] = await Promise.all([
+        studentsApi.getAll(),
+        activitiesApi.getAll(),
+      ]);
+      setStudents(updatedStudents);
+      setActivities(updatedActivities);
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   const updateStudent = async (id: string, data: Partial<Student>) => {
-    await studentsApi.update(id, data);
-    const [updatedStudents, updatedActivities] = await Promise.all([
-      studentsApi.getAll(),
-      activitiesApi.getAll(),
-    ]);
-    setStudents(updatedStudents);
-    setActivities(updatedActivities);
+    try {
+      setOperationLoading(true);
+      await studentsApi.update(id, data);
+      const [updatedStudents, updatedActivities] = await Promise.all([
+        studentsApi.getAll(),
+        activitiesApi.getAll(),
+      ]);
+      setStudents(updatedStudents);
+      setActivities(updatedActivities);
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   const deleteStudent = async (id: string) => {
-    await studentsApi.remove(id);
-    setStudents((prev) => prev.filter((s) => s.id !== id));
-    setActivities((prev) =>
-      prev.map((a) => ({ ...a, students: a.students.filter((sid) => sid !== id) })),
-    );
-    setAttendance((prev) => prev.filter((r) => r.studentId !== id));
-    setPayments((prev) => prev.filter((p) => p.studentId !== id));
-    setAgreements((prev) => prev.filter((ag) => ag.studentId !== id));
+    try {
+      setOperationLoading(true);
+      await studentsApi.remove(id);
+      setStudents((prev) => prev.filter((s) => s.id !== id));
+      setActivities((prev) =>
+        prev.map((a) => ({ ...a, students: a.students.filter((sid) => sid !== id) })),
+      );
+      setAttendance((prev) => prev.filter((r) => r.studentId !== id));
+      setPayments((prev) => prev.filter((p) => p.studentId !== id));
+      setAgreements((prev) => prev.filter((ag) => ag.studentId !== id));
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   // ── Agreements ────────────────────────────────────────────
   const addAgreement = async (data: Omit<Agreement, 'id'>) => {
-    const newAgreement = await agreementsApi.create(data);
-    setAgreements((prev) => [...prev, newAgreement]);
+    try {
+      setOperationLoading(true);
+      const newAgreement = await agreementsApi.create(data);
+      setAgreements((prev) => [...prev, newAgreement]);
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   const updateAgreement = async (id: string, data: Partial<Agreement>) => {
-    const updated = await agreementsApi.update(id, data);
-    setAgreements((prev) => prev.map((a) => (a.id === id ? updated : a)));
+    try {
+      setOperationLoading(true);
+      const updated = await agreementsApi.update(id, data);
+      setAgreements((prev) => prev.map((a) => (a.id === id ? updated : a)));
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   // ── Attendance ────────────────────────────────────────────
   const addAttendance = async (data: Omit<AttendanceRecord, 'id'>) => {
-    const newRecord = await attendanceApi.create(data);
-    setAttendance((prev) => [...prev, newRecord]);
+    try {
+      setOperationLoading(true);
+      const newRecord = await attendanceApi.create(data);
+      setAttendance((prev) => [...prev, newRecord]);
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   const updateAttendance = async (id: string, data: Partial<AttendanceRecord>) => {
-    const updated = await attendanceApi.update(id, data);
-    setAttendance((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    try {
+      setOperationLoading(true);
+      const updated = await attendanceApi.update(id, data);
+      setAttendance((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   // ── Payments ──────────────────────────────────────────────
   const addPayment = async (data: Omit<Payment, 'id'>) => {
-    const newPayment = await paymentsApi.create(data);
-    setPayments((prev) => [...prev, newPayment]);
+    try {
+      setOperationLoading(true);
+      const newPayment = await paymentsApi.create(data);
+      setPayments((prev) => [...prev, newPayment]);
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   const updatePayment = async (id: string, data: Partial<Payment>) => {
-    const updated = await paymentsApi.update(id, data);
-    setPayments((prev) => prev.map((p) => (p.id === id ? updated : p)));
+    try {
+      setOperationLoading(true);
+      const updated = await paymentsApi.update(id, data);
+      setPayments((prev) => prev.map((p) => (p.id === id ? updated : p)));
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   // ── Teachers ──────────────────────────────────────────────
   const addTeacher = async (data: Omit<Teacher, 'id'>) => {
-    const newTeacher = await teachersApi.create(data);
-    setTeachers((prev) => [...prev, newTeacher]);
+    try {
+      setOperationLoading(true);
+      const newTeacher = await teachersApi.create(data);
+      setTeachers((prev) => [...prev, newTeacher]);
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   const updateTeacher = async (id: string, data: Partial<Teacher>) => {
-    const updated = await teachersApi.update(id, data);
-    setTeachers((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    try {
+      setOperationLoading(true);
+      const updated = await teachersApi.update(id, data);
+      setTeachers((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   const deleteTeacher = async (id: string) => {
-    await teachersApi.remove(id);
-    setTeachers((prev) => prev.filter((t) => t.id !== id));
-    setActivities((prev) =>
-      prev.map((a) => ({ ...a, teachers: a.teachers.filter((tid) => tid !== id) })),
-    );
+    try {
+      setOperationLoading(true);
+      await teachersApi.remove(id);
+      setTeachers((prev) => prev.filter((t) => t.id !== id));
+      setActivities((prev) =>
+        prev.map((a) => ({ ...a, teachers: a.teachers.filter((tid) => tid !== id) })),
+      );
+    } finally {
+      setOperationLoading(false);
+    }
+  };
+
+  // ── Appointments ──────────────────────────────────────
+  const addAppointment = async (data: Omit<Appointment, 'id'>) => {
+    try {
+      setOperationLoading(true);
+      const newAppointment = await appointmentsApi.create(data);
+      setAppointments((prev) => [...prev, newAppointment]);
+    } finally {
+      setOperationLoading(false);
+    }
+  };
+
+  const updateAppointment = async (id: string, data: Partial<Appointment>) => {
+    try {
+      setOperationLoading(true);
+      const updated = await appointmentsApi.update(id, data);
+      setAppointments((prev) => prev.map((a) => (a.id === id ? updated : a)));
+    } finally {
+      setOperationLoading(false);
+    }
+  };
+
+  const deleteAppointment = async (id: string) => {
+    try {
+      setOperationLoading(true);
+      await appointmentsApi.remove(id);
+      setAppointments((prev) => prev.filter((a) => a.id !== id));
+    } finally {
+      setOperationLoading(false);
+    }
   };
 
   const value: DataContextType = {
@@ -273,7 +401,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     attendance,
     payments,
     teachers,
+    appointments,
     loading,
+    operationLoading,
     error,
     refreshAll: fetchAll,
     addActivity,
@@ -291,6 +421,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     addTeacher,
     updateTeacher,
     deleteTeacher,
+    addAppointment,
+    updateAppointment,
+    deleteAppointment,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

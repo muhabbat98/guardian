@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useData } from '../contexts/DataContext';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 
 interface StudentFormDialogProps {
   studentId?: string;
@@ -9,6 +9,7 @@ interface StudentFormDialogProps {
 
 export function StudentFormDialog({ studentId, onClose }: StudentFormDialogProps) {
   const { students, addStudent, updateStudent, activities } = useData();
+  const { operationLoading } = useData();
   
   const student = studentId ? students.find(s => s.id === studentId) : null;
   
@@ -207,14 +208,17 @@ export function StudentFormDialog({ studentId, onClose }: StudentFormDialogProps
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+              disabled={operationLoading}
+              className="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              disabled={operationLoading}
+              className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
+              {operationLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               {studentId ? 'Update' : 'Add'} Student
             </button>
           </div>

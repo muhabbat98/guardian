@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useData } from '../../contexts/DataContext';
-import { Plus, FileText, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Plus, FileText, CheckCircle, Clock, AlertCircle, Loader2 } from 'lucide-react';
 
 interface AgreementsTabProps {
   studentId: string;
@@ -8,6 +8,7 @@ interface AgreementsTabProps {
 
 export function AgreementsTab({ studentId }: AgreementsTabProps) {
   const { agreements, addAgreement, updateAgreement } = useData();
+  const { operationLoading } = useData();
   const [isAddingAgreement, setIsAddingAgreement] = useState(false);
   const [newAgreement, setNewAgreement] = useState({
     agreementDate: new Date().toISOString().split('T')[0],
@@ -194,14 +195,17 @@ export function AgreementsTab({ studentId }: AgreementsTabProps) {
               <button
                 type="button"
                 onClick={() => setIsAddingAgreement(false)}
-                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                disabled={operationLoading}
+                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                disabled={operationLoading}
+                className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
+                {operationLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                 Create Agreement
               </button>
             </div>

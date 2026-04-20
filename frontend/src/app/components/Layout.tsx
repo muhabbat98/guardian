@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router';
-import { Home, Calendar, Users, Menu, X, AlertCircle, Loader2, RefreshCw, LogOut, User } from 'lucide-react';
+import { Home, Calendar, Users, Menu, X, AlertCircle, Loader2, RefreshCw, LogOut, User, GraduationCap } from 'lucide-react';
 import { useState } from 'react';
 import logo from 'figma:asset/a0872c80c0190fe6764ce4ea81f9ee41dabf202e.png';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -20,6 +20,9 @@ export function Layout() {
     { name: t.dashboard, path: '/', icon: Home },
     { name: t.activities, path: '/activities', icon: Calendar },
     { name: t.students, path: '/students', icon: Users },
+    ...(user && (user.role === 'admin' || user.role === 'teacher')
+      ? [{ name: 'Teachers', path: '/teachers', icon: GraduationCap }]
+      : []),
   ];
 
   const isActive = (path: string) => {

@@ -4,10 +4,12 @@ import { Plus, Search, Users, Mail, Phone, Edit, Trash2, AlertCircle } from 'luc
 import { Link } from 'react-router';
 import { StudentFormDialog } from './StudentFormDialog';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export function Students() {
   const { students, deleteStudent, activities, payments } = useData();
   const { t } = useLanguage();
+  const { can } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<string | null>(null);
@@ -48,7 +50,8 @@ export function Students() {
         </div>
         <button
           onClick={() => setIsAddDialogOpen(true)}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          disabled={!can.addStudent}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Plus className="w-5 h-5" />
           <span>{t.addStudent}</span>
@@ -99,18 +102,22 @@ export function Students() {
                     </p>
                   </div>
                   <div className="flex gap-1 lg:hidden">
-                    <button
-                      onClick={() => setEditingStudent(student.id)}
-                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(student.id, `${student.firstName} ${student.lastName}`)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {can.editStudent && (
+                      <button
+                        onClick={() => setEditingStudent(student.id)}
+                        className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    )}
+                    {can.deleteStudent && (
+                      <button
+                        onClick={() => handleDelete(student.id, `${student.firstName} ${student.lastName}`)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -164,18 +171,22 @@ export function Students() {
                   {t.viewDetails}
                 </Link>
                 <div className="hidden lg:flex gap-2">
-                  <button
-                    onClick={() => setEditingStudent(student.id)}
-                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(student.id, `${student.firstName} ${student.lastName}`)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {can.editStudent && (
+                    <button
+                      onClick={() => setEditingStudent(student.id)}
+                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                  )}
+                  {can.deleteStudent && (
+                    <button
+                      onClick={() => handleDelete(student.id, `${student.firstName} ${student.lastName}`)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

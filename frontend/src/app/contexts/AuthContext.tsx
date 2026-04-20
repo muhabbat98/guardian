@@ -16,6 +16,20 @@ interface AuthContextType {
   signup: (email: string, password: string, role: string, firstName: string, lastName: string) => Promise<void>;
   logout: () => void;
   hasRole: (roles: string[]) => boolean;
+  can: {
+    addStudent: boolean;
+    editStudent: boolean;
+    deleteStudent: boolean;
+    addActivity: boolean;
+    editActivity: boolean;
+    deleteActivity: boolean;
+    addTeacher: boolean;
+    editTeacher: boolean;
+    deleteTeacher: boolean;
+    manageAttendance: boolean;
+    managePayments: boolean;
+    manageAgreements: boolean;
+  };
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -96,8 +110,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return user ? roles.includes(user.role) : false;
   };
 
+  // Compute permissions based on user role
+  const getPermissions = () => {
+    if (!user) {
+      return {
+        addStudent: false,
+        editStudent: false,
+        deleteStudent: false,
+        addActivity: false,
+        editActivity: false,
+        deleteActivity: false,
+        addTeacher: false,
+        editTeacher: false,
+        deleteTeacher: false,
+        manageAttendance: false,
+        managePayments: false,
+        manageAgreements: false,
+      };
+    }
+
+    const isAdmin = user.role === 'admin';
+    const isTeacher = user.role === 'teacher';
+    const isStudent = user.role === 'student';
+
+    return {
+      addStudent: isAdmin, // Only ADMIN can create students
+      editStudent: isAdmin || isStudent, // ADMIN or own profile (STUDENT)
+      deleteStudent: isAdmin, // Only ADMIN can delete
+      addActivity: isAdmin || isTeacher, // TEACHER or ADMIN
+      editActivity: isAdmin || isTeacher, // TEACHER or ADMIN
+      deleteActivity: isAdmin || isTeacher, // TEACHER or ADMIN
+      addTeacher: isAdmin, // Only ADMIN
+      editTeacher: isAdmin, // Only ADMIN
+      deleteTeacher: isAdmin, // Only ADMIN
+      manageAttendance: isAdmin || isTeacher, // TEACHER or ADMIN
+      managePayments: isAdmin || isTeacher, // TEACHER or ADMIN
+      manageAgreements: isAdmin || isTeacher, // TEACHER or ADMIN
+    };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, signup, logout, hasRole }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, signup, logout, hasRole, can: getPermissions() }}>
       {children}
     </AuthContext.Provider>
   );

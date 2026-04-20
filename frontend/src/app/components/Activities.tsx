@@ -4,10 +4,12 @@ import { Plus, Search, Calendar, Users as UsersIcon, Clock, Edit, Trash2 } from 
 import { Link } from 'react-router';
 import { ActivityFormDialog } from './ActivityFormDialog';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export function Activities() {
   const { activities, deleteActivity, students, teachers } = useData();
   const { t } = useLanguage();
+  const { can } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingActivity, setEditingActivity] = useState<string | null>(null);
@@ -38,7 +40,8 @@ export function Activities() {
         </div>
         <button
           onClick={() => setIsAddDialogOpen(true)}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          disabled={!can.addActivity}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Plus className="w-5 h-5" />
           <span>{t.addActivity}</span>
@@ -67,18 +70,22 @@ export function Activities() {
             <div className="flex items-start justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">{activity.name}</h3>
               <div className="flex gap-1">
-                <button
-                  onClick={() => setEditingActivity(activity.id)}
-                  className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDelete(activity.id, activity.name)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {can.editActivity && (
+                  <button
+                    onClick={() => setEditingActivity(activity.id)}
+                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                )}
+                {can.deleteActivity && (
+                  <button
+                    onClick={() => handleDelete(activity.id, activity.name)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             </div>
 

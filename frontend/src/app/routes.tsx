@@ -5,6 +5,7 @@ import { Activities } from "./components/Activities";
 import { ActivityDetails } from "./components/ActivityDetails";
 import { Students } from "./components/Students";
 import { StudentDetails } from "./components/StudentDetails";
+import { Teachers } from "./components/Teachers";
 import { NotFound } from "./components/NotFound";
 import { SignIn } from "./pages/SignIn";
 import { SignUp } from "./pages/SignUp";
@@ -59,6 +60,14 @@ export const router = createBrowserRouter([
         Component: () => (
           <ProtectedRoute>
             <StudentDetails />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "teachers",
+        Component: () => (
+          <ProtectedRoute>
+            <Teachers />
           </ProtectedRoute>
         ),
       },

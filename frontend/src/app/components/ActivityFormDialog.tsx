@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useData, Activity } from '../contexts/DataContext';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 
 interface ActivityFormDialogProps {
   activityId?: string;
@@ -9,6 +9,7 @@ interface ActivityFormDialogProps {
 
 export function ActivityFormDialog({ activityId, onClose }: ActivityFormDialogProps) {
   const { activities, addActivity, updateActivity, teachers, students } = useData();
+  const { operationLoading } = useData();
   
   const activity = activityId ? activities.find(a => a.id === activityId) : null;
   
@@ -198,14 +199,17 @@ export function ActivityFormDialog({ activityId, onClose }: ActivityFormDialogPr
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+              disabled={operationLoading}
+              className="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              disabled={operationLoading}
+              className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
+              {operationLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               {activityId ? 'Update' : 'Create'} Activity
             </button>
           </div>
